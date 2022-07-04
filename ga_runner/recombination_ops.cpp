@@ -4,7 +4,7 @@
 
 static std::random_device dev_urandom;
 static std::mt19937 point_rng(dev_urandom());
-std::vector<bool_string> multi_point_crossingover(bool_string bs1, bool_string bs2)
+std::vector<BoolString> multi_point_crossingover(BoolString bs1, BoolString bs2)
 {
 	std::vector<size_t> points;
 	// Генерируем ceil(ln(N)) уникальных точек разреза
@@ -24,7 +24,7 @@ std::vector<bool_string> multi_point_crossingover(bool_string bs1, bool_string b
 	}
 	std::sort(points.begin(), points.end());
 	// Генерируем первого потомка: берём первую булеву строку и вставляем в неё фрагменты из второй согласно точкам разреза
-	bool_string ch1 = bs1;
+	BoolString ch1 = bs1;
 	for(size_t i = 0; i < points.size(); i += 2){
 		if(i != points.size() - 1){
 			std::copy(bs2.begin() + points[i], bs2.begin() + points[i + 1], ch1.begin() + points[i]);
@@ -35,7 +35,7 @@ std::vector<bool_string> multi_point_crossingover(bool_string bs1, bool_string b
 		}
 	}
 	// Генерируем второго потомка: берём вторую булеву строку и вставляем в неё фрагменты из первой согласно точкам разреза
-	bool_string ch2 = bs2;
+	BoolString ch2 = bs2;
 	for(size_t i = 0; i < points.size(); i += 2){
 		if(i != points.size() - 1){
 			std::copy(bs1.begin() + points[i], bs1.begin() + points[i + 1], ch2.begin() + points[i]);

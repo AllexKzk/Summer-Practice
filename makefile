@@ -1,5 +1,5 @@
 INCLUDE := -I.
-LIBS :=
+LIBS := -lpthread
 FLAGS := -g -Wall -Wextra -std=c++2a
 
 SRC := $(shell find . -name "*.cpp")

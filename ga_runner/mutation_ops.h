@@ -7,7 +7,7 @@
 
 // Мутация с использованием понятия плотности
 extern double density_mutation_chance;	// шанс мутации (инверсии) каждого гена: [0; 1], по умолчанию 0.01
-bool_string density_mutation_op(bool_string bs);
+BoolString density_mutation_op(BoolString bs);
 
 
 #endif

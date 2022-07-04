@@ -5,14 +5,14 @@ static std::random_device dev_urandom;
 static std::mt19937 rng(dev_urandom());
 
 double roulette_fitness_influence = 0.8;
-std::pair<bool_string, bool_string> roulette_bs_selection_op(std::vector<bool_string> individuals,
-																double (*fitness_func)(bool_string))
+std::pair<BoolString, BoolString> roulette_bs_selection_op(std::vector<BoolString> individuals,
+																double (*fitness_func)(BoolString))
 {
 	double fsum = 0; // сумма всех значений функций приспособленности
 	for(size_t i = 0; i < individuals.size(); ++i)
 		fsum += fitness_func(individuals[i]);
 
-	bool_string p1, p2; unsigned pcnt = 0;
+	BoolString p1, p2; unsigned pcnt = 0;
 	std::uniform_real_distribution<double> roulette_dist(0, 1);
 	double roll1 = roulette_dist(rng), roll2 = roulette_dist(rng);
 

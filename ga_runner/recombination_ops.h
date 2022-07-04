@@ -6,6 +6,6 @@
 /* Бинарная рекомбинация (кроссинговер) */
 
 // Количество точек равно ceil(ln(N)), где N - количество бит в двоичных строках
-std::vector<bool_string> multi_point_crossingover(bool_string bs1, bool_string bs2);
+std::vector<BoolString> multi_point_crossingover(BoolString bs1, BoolString bs2);
 
 #endif
