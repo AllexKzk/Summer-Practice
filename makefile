@@ -1,6 +1,6 @@
 INCLUDE := -I.
-LIBS := -lpthread
-FLAGS := -g -Wall -Wextra -std=c++2a
+LIBS := -lpthread `pkg-config gtkmm-3.0 --libs`
+FLAGS := -g -Wall -Wextra `pkg-config gtkmm-3.0 --cflags`
 
 SRC := $(shell find . -name "*.cpp")
 OBJ := $(addsuffix .o,$(basename $(SRC)))

@@ -1,4 +1,5 @@
 #include "recombination_ops.h"
+#include <algorithm>
 #include <random>
 #include <cmath>
 

@@ -1,4 +1,5 @@
 #include "survivor_selection_ops.h"
+#include <algorithm>
 #include <random>
 
 static std::random_device dev_urandom;
