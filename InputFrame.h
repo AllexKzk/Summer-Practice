@@ -13,6 +13,7 @@ public:
 	InputFrame();
 	virtual ~InputFrame();
 	void addTable(unsigned int size);
+	void saveInputData(std::string fileName, unsigned int size);
 };
 
 #endif

@@ -41,3 +41,18 @@ void InputTable::resizeTable(unsigned int size)
 	show_all_children();
 }
 
+void InputTable::saveData(unsigned int size, std::string fileName)
+{
+	std::fstream file;
+	file.open(fileName, std::fstream::app);
+
+	for (unsigned i = 1; i < size + 1; ++i){
+		for (unsigned j = 1; j < size + 1; ++j){
+			Gtk::SpinButton* pSpin = (Gtk::SpinButton*) grid.get_child_at(j, i);
+			file << pSpin->get_value() << " ";
+		}
+		file << "\n";
+	}
+
+	file.close();
+}

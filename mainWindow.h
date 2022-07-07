@@ -18,6 +18,8 @@ private:
 	StepFrame steps;
 	ResultFrame result;
 
+	std::string dataFileName = "data";
+
 	void changeFrame();	
 	unsigned short mode = 0;
 public:

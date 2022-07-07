@@ -2,6 +2,8 @@
 #define SETTINGSFRAME_H
 
 #include <gtkmm.h>
+#include <fstream>
+#include <string>
 #include <vector>
 #include "SpinBox.h"
 
@@ -24,6 +26,7 @@ public:
 	virtual ~SettingsFrame();
 	bool isProgramInput();
 	unsigned int getVar();
+	void saveSettingsData(std::string fileName);
 };
 
 #endif
