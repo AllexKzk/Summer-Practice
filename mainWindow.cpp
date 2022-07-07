@@ -45,9 +45,11 @@ void MainWindow::changeFrame(){
 					changeFrame();
 				}
 			}
+			settings.saveSettingsData(dataFileName);
 			break;
 		case 1:
 			input.hide();
+			input.saveInputData(dataFileName, settings.getVar());
 			steps.show();
 			nextStep.set_label("К результату");
 			mode = 2;
@@ -56,7 +58,7 @@ void MainWindow::changeFrame(){
 			steps.hide();
 			result.show();
 
-			nextStep.set_label("Ещё раз");
+			nextStep.set_label("Задать новые данные");
 			mode = 3;
 			break;
 		case 3:

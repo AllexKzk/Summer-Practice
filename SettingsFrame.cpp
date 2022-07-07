@@ -61,10 +61,26 @@ void SettingsFrame::rangeCorrection()
 	}
 }
 
-bool SettingsFrame::isProgramInput(){
+bool SettingsFrame::isProgramInput()
+{
 	return inProgram.get_active();
 }
 
-unsigned int SettingsFrame::getVar(){
+unsigned int SettingsFrame::getVar()
+{
 	return unknownVarSpin.spin.get_value();
+}
+
+void SettingsFrame::saveSettingsData(std::string fileName)
+{
+	std::fstream file;
+	file.open(fileName, std::fstream::out);
+
+	for (auto pSpin: spinBoxVec)
+	{
+		file << pSpin->spin.get_value() << " ";
+	}
+
+	file << unknownVarSpin.spin.get_value() << std::endl;
+	file.close();
 }
