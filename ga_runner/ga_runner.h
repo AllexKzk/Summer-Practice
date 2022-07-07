@@ -1,7 +1,9 @@
 #ifndef GA_RUNNER_H
 #define GA_RUNNER_H
 
+#include <any>
 #include <iostream>
+#include <map>
 #include <vector>
 #include <random>
 #include <pthread.h>
@@ -23,12 +25,15 @@ class GARunner
 		std::vector<data> current_population;
 
 		double mutation_chance;
-		double (*fitness_func)(data);
+	public:
+		double (*fitness_func)(GARunner<data>& gar, data);
 
-		std::vector<data> (*recombination_op)(data, data);
-		data (*mutation_op)(data);
-		std::pair<data, data> (*parent_selection_op)(std::vector<data>, double (*fitness_func_arg)(data));
-		std::vector<data> (*survivor_selection_op)(std::vector<data>, size_t amount, double (*fitness_func_arg)(data));
+	private:
+		// Операторы ГА
+		std::vector<data> (*recombination_op)(GARunner<data>& gar, data, data);
+		data (*mutation_op)(GARunner<data>& gar, data);
+		std::pair<data, data> (*parent_selection_op)(GARunner<data>& gar, std::vector<data>);
+		std::vector<data> (*survivor_selection_op)(GARunner<data>& gar, std::vector<data>, size_t amount);
 
 		std::random_device dev_urandom;
 
@@ -40,6 +45,7 @@ class GARunner
 			std::cout << '\n';
 		}
 
+		// Оперирование в отдельном потоке
 		pthread_t work_thread;
 
 		pthread_mutex_t thread_mode_mutex;
@@ -71,17 +77,20 @@ class GARunner
 			return NULL;
 		}
 
+		// Параметры (операторов/пользовательские)
+		std::map<std::string, std::any> parameters;
+
 
 	public:
 		std::vector<data>& get_current_population() { return current_population; }
 
 		GARunner(size_t population_size, std::vector<data> initial_population,
 			double mutation_chance,
-			double (*fitness_func)(data),
-			std::vector<data> (*recombination_op)(data, data),
-			data (*mutation_op)(data),
-			std::pair<data, data> (*parent_selection_op)(std::vector<data>, double (*fitness_func_arg)(data)),
-			std::vector<data> survivor_selection_op(std::vector<data>, size_t amount, double (*fitness_func_arg)(data)))
+			double (*fitness_func)(GARunner<data>& gar, data),
+			std::vector<data> (*recombination_op)(GARunner<data>& gar, data, data),
+			data (*mutation_op)(GARunner<data>& gar, data),
+			std::pair<data, data> (*parent_selection_op)(GARunner<data>& gar, std::vector<data>),
+			std::vector<data> survivor_selection_op(GARunner<data>& gar, std::vector<data>, size_t amount))
 		: population_size(population_size), current_population(initial_population), mutation_chance(mutation_chance),
 		fitness_func(fitness_func), recombination_op(recombination_op), mutation_op(mutation_op), parent_selection_op(parent_selection_op), survivor_selection_op(survivor_selection_op)
 		{
@@ -95,10 +104,10 @@ class GARunner
 			std::vector<data> children;
 			for(size_t i = 0; i <= population_size; i += 2){
 				// отбираем двух родителей
-				std::pair<data, data> parents = parent_selection_op(current_population, fitness_func);
+				std::pair<data, data> parents = parent_selection_op(*this, current_population);
 				std::cout << "parents: "; print_data({parents.first, parents.second});
 				if(parents.first != parents.second){
-					std::vector<data> more_children = recombination_op(parents.first, parents.second); // проводим скрещивание
+					std::vector<data> more_children = recombination_op(*this, parents.first, parents.second); // проводим скрещивание
 					std::copy(more_children.begin(), more_children.end(), std::back_inserter(children));
 				}
 			}
@@ -108,12 +117,12 @@ class GARunner
 			std::uniform_real_distribution<double> mutation_dist(0, 1);
 			for(size_t i = 0; i < children.size(); ++i)
 				if(mutation_dist(rng) < mutation_chance)
-					children[i] = mutation_op(children[i]);	// производим мутацию с заданным шансом
+					children[i] = mutation_op(*this, children[i]);	// производим мутацию с заданным шансом
 			std::cout << "mutated children: "; print_data(children);
 
 			// заносим детей и родителей в один список и отбираем оттуда особей для следующей популяции
 			std::copy(children.begin(), children.end(), std::back_inserter(current_population));
-			current_population = survivor_selection_op(current_population, population_size, fitness_func);
+			current_population = survivor_selection_op(*this, current_population, population_size);
 
 			std::cout << "current population: "; print_data(current_population);
 
@@ -145,6 +154,15 @@ class GARunner
 			pthread_mutex_unlock(&thread_mode_mutex);
 			if(create_thread)
 				pthread_create(&work_thread, NULL, GARunner::thread_iteration, (void*)this);
+		}
+
+		void add_parameter(std::string name, std::any value) { parameters[name] = value; }
+		void remove_parameter(std::string name) { parameters.erase(parameters.find(name)); }
+		std::any get_parameter(std::string name, std::any _default)
+		{
+			if(parameters.find(name) == parameters.end())
+				return _default;
+			return parameters[name];
 		}
 
 		void print_current_population() { print_data(current_population); }
