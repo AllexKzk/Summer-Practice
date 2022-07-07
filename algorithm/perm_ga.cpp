@@ -23,3 +23,16 @@ std::vector<BoolString> generate_rand_perms(size_t matrix_size, size_t pop_size)
     }
     return vbs;
 }
+
+double perm_fitness_func(GARunner<BoolString> &gar,BoolString bs){
+    std::vector<std::vector<double>> mat = std::any_cast<std::vector<std::vector<double>>>(gar.get_parameter("cost_matrix", {}));
+    Permutation p = bool_string_to_perm(bs, mat.size());
+    if (p.size() != mat.size()){
+        return -INFINITY;
+    }
+    double summ = 0;
+    for(size_t i = 0; i < p.size(); i++){
+        summ -= mat[i][p[i]];
+    }
+    return summ;
+}
