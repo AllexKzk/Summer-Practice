@@ -5,7 +5,7 @@
 
 static std::random_device dev_urandom;
 static std::mt19937 point_rng(dev_urandom());
-std::vector<BoolString> multi_point_crossingover(BoolString bs1, BoolString bs2)
+std::vector<BoolString> multi_point_crossingover(GARunner<BoolString>& gar, BoolString bs1, BoolString bs2)
 {
 	std::vector<size_t> points;
 	// Генерируем ceil(ln(N)) уникальных точек разреза

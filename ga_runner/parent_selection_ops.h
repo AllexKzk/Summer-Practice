@@ -6,9 +6,8 @@
 /* Выбор родителей для бинарных строк */
 
 // Метод рулетки
-extern double roulette_fitness_influence; 	// влияние значения функции приспособленности на шанс хромосомы быть выбранной в методе рулетки: [0, 1]
-std::pair<BoolString, BoolString> roulette_bs_selection_op(std::vector<BoolString> individuals,
-																double (*fitness_func)(BoolString));
+// [double] "roulette_fitness_influence": влияние значения функции приспособленности на шанс хромосомы быть выбранной в методе рулетки: [0, 1] (по умолчанию 0.8)
+std::pair<BoolString, BoolString> roulette_bs_selection_op(GARunner<BoolString>& gar, std::vector<BoolString> individuals);
 
 
 #endif
