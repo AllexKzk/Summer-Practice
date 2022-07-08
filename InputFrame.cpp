@@ -16,12 +16,13 @@ InputFrame::InputFrame():
 
 InputFrame::~InputFrame(){}
 
-void InputFrame::saveInputData(std::string fileName, unsigned int size)
-{
-	input.saveData(size, fileName);
-}
 
 void InputFrame::addTable(unsigned int size)
 {
 	input.resizeTable(size);
+}
+
+InputTable& InputFrame::getInputTable()
+{
+	return input;
 }

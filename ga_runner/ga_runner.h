@@ -29,9 +29,9 @@ class GARunner
 		double (*fitness_func)(GARunner<data>& gar, data);
 
 		// callback-функции
-		void (*callback_iteration_start)(GARunner<data>&) = nullptr;
+		void (*callback_iteration_start)(GARunner<data>&, std::vector<data>) = nullptr;
 		void (*callback_new_children)(GARunner<data>&, std::pair<data, data> parents, std::vector<data> children) = nullptr;
-		void (*callback_mutation)(GARunner<data>&, std::vector<data>) = nullptr;
+		void (*callback_mutation)(GARunner<data>&, std::vector<data> old_children, std::vector<data> new_children) = nullptr;
 		void (*callback_new_population)(GARunner<data>&, std::vector<data>) = nullptr;
 	private:
 		// Операторы ГА
@@ -106,7 +106,7 @@ class GARunner
 
 		size_t do_iteration()
 		{
-			if(callback_iteration_start) callback_iteration_start(*this);
+			if(callback_iteration_start) callback_iteration_start(*this, current_population);
 			std::vector<data> children;
 			for(size_t i = 0; i <= population_size; i += 2){
 				// отбираем двух родителей
@@ -120,12 +120,13 @@ class GARunner
 			}
 			std::cout << "children: "; print_data(children);
 
+			std::vector<data> old_children = children;
 			std::mt19937 rng(dev_urandom());
 			std::uniform_real_distribution<double> mutation_dist(0, 1);
 			for(size_t i = 0; i < children.size(); ++i)
 				if(mutation_dist(rng) < mutation_chance)
 					children[i] = mutation_op(*this, children[i]);	// производим мутацию с заданным шансом
-			if(callback_mutation) callback_mutation(*this, children);
+			if(callback_mutation) callback_mutation(*this, old_children, children);
 			std::cout << "mutated children: "; print_data(children);
 
 			// заносим детей и родителей в один список и отбираем оттуда особей для следующей популяции

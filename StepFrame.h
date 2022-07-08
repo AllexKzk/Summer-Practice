@@ -4,26 +4,32 @@
 #include <gtkmm.h>
 #include <vector>
 #include "StepTable.h"
+#include "InputFrame.h"
+#include "SettingsFrame.h"
+
+#include "ga_runner/ga_runner.h"
 
 class StepFrame: public Gtk::Frame
 {
 private:
 	Gtk::Box mainStepBox;
-
-	StepTable initPopulation, chosenParents, crossingOver, 
+public:
+	StepTable initPopulation, crossingOver,
 		mutations, newPopulation, bestObj;
+private:
 	std::vector<StepTable*> tables;
-	
+
 	Gtk::Button nextStep;
-	std::string fileName = "exp.txt";
+
+	GARunner<BoolString>* gar = nullptr;
 
 public:
 	StepFrame();
-	virtual ~StepFrame();
+	void initGARunner(SettingsFrame& sfr, InputTable& ifr);
 
-	void unparseFile();
 	void newStep();
 
+	std::vector<BoolString> children_before_mut;
 };
 
 #endif

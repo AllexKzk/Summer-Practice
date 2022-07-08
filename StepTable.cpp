@@ -12,14 +12,24 @@ StepTable::StepTable(Glib::ustring firstColumnName, Glib::ustring secondColumnNa
 	treeView.append_column(secondColumnName, columns.column2);
 
 }
-
 StepTable::~StepTable(){}
+
+void StepTable::addRow(std::string e1, std::string e2)
+{
+	Gtk::TreeModel::Row row = *(refColumns->append());
+	row[columns.column1] = e1;
+	row[columns.column2] = e2;
+}
+void StepTable::clear()
+{
+	refColumns->clear();
+}
 
 void StepTable::importFromFile(std::string fileName)
 {
 	std::string str1, str2;
 	std::fstream file;
-	file.open(fileName, std::fstream::in); 
+	file.open(fileName, std::fstream::in);
 
 	Gtk::TreeModel::Row row;
 	refColumns->clear();

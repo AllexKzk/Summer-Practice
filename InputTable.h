@@ -3,18 +3,19 @@
 
 #include <gtkmm.h>
 #include <string>
-#include <fstream>
+#include <vector>
 
 class InputTable: public Gtk::ScrolledWindow
 {
 private:
 	Gtk::Grid grid;
+	size_t mat_size;
 public:
 	InputTable(unsigned int size);
-	virtual ~InputTable();	
+	virtual ~InputTable();
 
 	void resizeTable(unsigned int size);
-	void saveData(unsigned int size, std::string fileName);
+	std::vector<std::vector<double>> getMatrix();
 };
 
 #endif

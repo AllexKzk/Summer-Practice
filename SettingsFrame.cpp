@@ -1,17 +1,17 @@
 #include "SettingsFrame.h"
+#include <climits>
 
 SettingsFrame::SettingsFrame():
 	settingsMainBox(Gtk::ORIENTATION_VERTICAL, 10),
 	genAlgSetBox(Gtk::ORIENTATION_VERTICAL, 10),
-	
 	inFile("Через файл"), inProgram("Через программу"),
 
-	unknownVarSpin("Значение N: ", Gtk::Adjustment::create(1.0, 1.0, 100, 1.0, 5.0, 0.0)),
-	popBox("Начальный размер популяции: ", Gtk::Adjustment::create(1.0, 1.0, 1, 1.0, 5.0, 0.0)),
-	ruleBox("Критерий остановки: ", Gtk::Adjustment::create(1.0, 1.0, 1, 1.0, 5.0, 0.0)),
-	infBox("Коэффициент влияния: ", Gtk::Adjustment::create(1.0, 1.0, 1, 1.0, 5.0, 0.0)),
-	mutBox("Плотность мутации: ", Gtk::Adjustment::create(1.0, 1.0, 1, 1.0, 5.0, 0.0)),
-	selBox("Количество особей элитного отбора: ", Gtk::Adjustment::create(1.0, 1.0, 1, 1.0, 5.0, 0.0))
+	unknownVarSpin("Значение N: ", Gtk::Adjustment::create(4, 1, 100, 1, 5, 0)),
+	popBox("Начальный размер популяции: ", Gtk::Adjustment::create(30, 1, 1000, 5, 20, 0)),
+	ruleBox("Остановка после итераций: ", Gtk::Adjustment::create(1000, 1, UINT_MAX, 100, 1000, 0)),
+	infBox("Влияение приспособленности на выбор родителя (%): ", Gtk::Adjustment::create(80, 0, 100, 10, 25, 0)),
+	mutBox("Плотность мутации (% от всех генов): ", Gtk::Adjustment::create(1, 0, 100, 1, 5, 0)),
+	selBox("Количество особей элитного отбора (%): ", Gtk::Adjustment::create(20, 0, 100, 5, 10, 0))
 
 {
 
@@ -25,9 +25,6 @@ SettingsFrame::SettingsFrame():
 	genAlgSetBox.set_border_width(10);
 
 	inFile.join_group(inProgram);
-
-	unknownVarSpin.spin.signal_value_changed().connect(sigc::mem_fun(*this,
-              &SettingsFrame::rangeCorrection));
 
 	inputSetBox.pack_start(inFile);
 	inputSetBox.pack_start(inProgram);
@@ -49,38 +46,14 @@ SettingsFrame::SettingsFrame():
 
 SettingsFrame::~SettingsFrame(){}
 
-void SettingsFrame::rangeCorrection()
-{
-	for (auto pBox: spinBoxVec)
-	{
-		unsigned int upperValue = unknownVarSpin.spin.get_value();
-		unsigned int oldValue = pBox->spin.get_value();
-		unsigned int curValue = std::min(upperValue, oldValue);
-		pBox->spin.set_adjustment(Gtk::Adjustment::create(curValue, 1.0, 
-									upperValue, 1.0, 5.0, 0.0));
-	}
-}
-
 bool SettingsFrame::isProgramInput()
 {
 	return inProgram.get_active();
 }
 
-unsigned int SettingsFrame::getVar()
-{
-	return unknownVarSpin.spin.get_value();
-}
-
-void SettingsFrame::saveSettingsData(std::string fileName)
-{
-	std::fstream file;
-	file.open(fileName, std::fstream::out);
-
-	for (auto pSpin: spinBoxVec)
-	{
-		file << pSpin->spin.get_value() << " ";
-	}
-
-	file << unknownVarSpin.spin.get_value() << std::endl;
-	file.close();
-}
+unsigned SettingsFrame::getN() { return unknownVarSpin.spin.get_value(); }
+unsigned SettingsFrame::getPopSize() { return popBox.spin.get_value(); }
+unsigned SettingsFrame::getIterationStop() { return ruleBox.spin.get_value(); }
+double SettingsFrame::getFitnessRouletteInfluence() { return infBox.spin.get_value() / 100.; }
+double SettingsFrame::getMutationDensity() { return mutBox.spin.get_value() / 100.; }
+double SettingsFrame::getEliteFraction() { return selBox.spin.get_value() / 100.; }

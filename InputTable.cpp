@@ -2,7 +2,7 @@
 
 InputTable::InputTable(unsigned int size)
 {
-
+	mat_size = size;
 	set_border_width(10);
 	set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_ALWAYS);
 
@@ -20,9 +20,10 @@ InputTable::~InputTable(){}
 
 void InputTable::resizeTable(unsigned int size)
 {
-	for(int i = 0; i < size + 1; i++)
+	mat_size = size;
+	for(unsigned i = 0; i < size + 1; i++)
 	{
-		for(int j = 0; j < size + 1; j++)
+		for(unsigned j = 0; j < size + 1; j++)
 		{
 			if (i == 0 && j != 0 ){
 				auto label = Gtk::make_managed<Gtk::Label>(std::to_string(j));
@@ -41,18 +42,16 @@ void InputTable::resizeTable(unsigned int size)
 	show_all_children();
 }
 
-void InputTable::saveData(unsigned int size, std::string fileName)
+std::vector<std::vector<double>> InputTable::getMatrix()
 {
-	std::fstream file;
-	file.open(fileName, std::fstream::app);
-
-	for (unsigned i = 1; i < size + 1; ++i){
-		for (unsigned j = 1; j < size + 1; ++j){
+	std::vector<std::vector<double>> mat;
+	for (unsigned i = 1; i < mat_size + 1; ++i){
+		std::vector<double> v;
+		for (unsigned j = 1; j < mat_size + 1; ++j){
 			Gtk::SpinButton* pSpin = (Gtk::SpinButton*) grid.get_child_at(j, i);
-			file << pSpin->get_value() << " ";
+			v.push_back(pSpin->get_value());
 		}
-		file << "\n";
+		mat.push_back(v);
 	}
-
-	file.close();
+	return mat;
 }

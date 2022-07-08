@@ -18,15 +18,18 @@ private:
 	Gtk::Frame inputSetFrame, genAlgSetFrame;
 
 	Gtk::RadioButton inFile, inProgram;
-	
-	void rangeCorrection();
 
 public:
 	SettingsFrame();
 	virtual ~SettingsFrame();
 	bool isProgramInput();
-	unsigned int getVar();
-	void saveSettingsData(std::string fileName);
+
+	unsigned getN();
+	unsigned getPopSize();
+	unsigned getIterationStop();
+	double getFitnessRouletteInfluence();
+	double getMutationDensity();
+	double getEliteFraction();
 };
 
 #endif

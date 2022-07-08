@@ -20,7 +20,7 @@ private:
 
 	std::string dataFileName = "data";
 
-	void changeFrame();	
+	void changeFrame();
 	unsigned short mode = 0;
 public:
 	MainWindow();

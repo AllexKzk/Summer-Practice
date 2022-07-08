@@ -32,7 +32,7 @@ void MainWindow::changeFrame(){
 	{
 		case 0:
 			if (settings.isProgramInput()){
-				input.addTable(settings.getVar());
+				input.addTable(settings.getN());
 				input.show();
 				settings.hide();
 				mode = 1;
@@ -45,11 +45,10 @@ void MainWindow::changeFrame(){
 					changeFrame();
 				}
 			}
-			settings.saveSettingsData(dataFileName);
 			break;
 		case 1:
 			input.hide();
-			input.saveInputData(dataFileName, settings.getVar());
+			steps.initGARunner(settings, input.getInputTable());
 			steps.show();
 			nextStep.set_label("К результату");
 			mode = 2;
