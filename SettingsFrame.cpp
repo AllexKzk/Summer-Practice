@@ -9,9 +9,9 @@ SettingsFrame::SettingsFrame():
 	unknownVarSpin("Значение N: ", Gtk::Adjustment::create(4, 1, 100, 1, 5, 0)),
 	popBox("Начальный размер популяции: ", Gtk::Adjustment::create(30, 1, 1000, 5, 20, 0)),
 	ruleBox("Остановка после итераций: ", Gtk::Adjustment::create(1000, 1, UINT_MAX, 100, 1000, 0)),
-	infBox("Влияение приспособленности на выбор родителя (%): ", Gtk::Adjustment::create(80, 0, 100, 10, 25, 0)),
-	mutBox("Плотность мутации (% от всех генов): ", Gtk::Adjustment::create(1, 0, 100, 1, 5, 0)),
-	selBox("Количество особей элитного отбора (%): ", Gtk::Adjustment::create(20, 0, 100, 5, 10, 0))
+	infBox("Влияение приспособленности на выбор родителя (%): ", Gtk::Adjustment::create(80, 0, 100, 10, 25, 0), 1.0, 2.0),
+	mutBox("Плотность мутации (% от всех генов): ", Gtk::Adjustment::create(1, 0, 100, 1, 5, 0), 1.0, 2.0),
+	selBox("Количество особей элитного отбора (%): ", Gtk::Adjustment::create(20, 0, 100, 5, 10, 0), 1.0, 2.0)
 
 {
 

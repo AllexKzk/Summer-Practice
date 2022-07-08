@@ -8,7 +8,7 @@ MainWindow::MainWindow():
 
 	mainBox.set_border_width(10);
 
-	nextStep.signal_clicked().connect( sigc::mem_fun(*this, &MainWindow::changeFrame) );
+	nextStep.signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::changeFrame));
 	nextStep.set_halign(Gtk::ALIGN_END);
 	nextStep.set_valign(Gtk::ALIGN_END);
 
@@ -33,8 +33,8 @@ void MainWindow::changeFrame(){
 		case 0:
 			if (settings.isProgramInput()){
 				input.addTable(settings.getN());
-				input.show();
 				settings.hide();
+				input.show();
 				mode = 1;
 			}
 			else {

@@ -7,8 +7,6 @@
 class InputFrame: public Gtk::Frame
 {
 private:
-	Gtk::Box inputMainBox;
-	InputTable input;
 public:
 	InputFrame();
 	virtual ~InputFrame();
