@@ -25,7 +25,7 @@ private:
 
 public:
 	StepFrame();
-	void initGARunner(SettingsFrame& sfr, InputTable& ifr);
+	void initGARunner(SettingsFrame& sfr, std::vector<std::vector<double>> matrix);
 
 	void newStep();
 

@@ -2,15 +2,17 @@
 #define CHOOSEFILEWINDOW_H
 
 #include <gtkmm.h>
-#include <iostream>
+#include <string>
 
 class ChooseFileWindow: public Gtk::Window
 {
 private:
 	Gtk::FileChooserDialog dialog;
+	std::string filePath;
 public:
 	ChooseFileWindow();
 	unsigned short open();
+	std::string getFilePath();
 	virtual ~ChooseFileWindow();
 };
 

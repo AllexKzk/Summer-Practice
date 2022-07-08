@@ -98,13 +98,13 @@ StepFrame::StepFrame():
 
 	add(mainStepBox);
 }
-void StepFrame::initGARunner(SettingsFrame& sfr, InputTable& ifr)
+void StepFrame::initGARunner(SettingsFrame& sfr, std::vector<std::vector<double>> matrix)
 {
 	// TODO: change mutation chance
 	gar = new GARunner<BoolString>(sfr.getPopSize(), generate_rand_perms(sfr.getN(), sfr.getPopSize()), 1.0, perm_fitness_func,
 											multi_point_crossingover, density_mutation_op, roulette_bs_selection_op, elite_truncation_survivor_selection_op);
 	gar->add_parameter("step_frame", this);
-	gar->add_parameter("cost_matrix", ifr.getMatrix());
+	gar->add_parameter("cost_matrix", matrix);
 	gar->callback_iteration_start = GACBIterationStart;
 	gar->callback_new_children = GACBNewChildren;
 	gar->callback_mutation = GACBMutation;

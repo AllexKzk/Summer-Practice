@@ -9,7 +9,7 @@ private:
 	Gtk::Label label;
 public:
 	Gtk::SpinButton spin;
-	SpinBox(Glib::ustring name, Glib::RefPtr<Gtk::Adjustment> adjustment, unsigned step, unsigned digits);
+	SpinBox(Glib::ustring name, Glib::RefPtr<Gtk::Adjustment> adjustment, unsigned step = 1, unsigned digits = 0);
 	virtual ~SpinBox();
 };
 
