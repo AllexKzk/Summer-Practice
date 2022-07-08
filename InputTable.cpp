@@ -34,7 +34,7 @@ void InputTable::resizeTable(unsigned int size)
 				grid.attach(*label, i, j);
 			}
 			else if (i != 0 && j != 0 ){
-				auto spin = Gtk::make_managed<Gtk::SpinButton>(Gtk::Adjustment::create(1.0, 1.0, 20, 1.0, 5.0, 0.0));
+				auto spin = Gtk::make_managed<Gtk::SpinButton>(Gtk::Adjustment::create(1.0, 1.0, 100.0, 1.0, 5.0), 1, 2);
 				grid.attach(*spin, i, j);
 			}
 		}

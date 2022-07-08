@@ -1,8 +1,8 @@
 #include "SpinBox.h"
 
-SpinBox::SpinBox(Glib::ustring name, Glib::RefPtr<Gtk::Adjustment> adjustment):
+SpinBox::SpinBox(Glib::ustring name, Glib::RefPtr<Gtk::Adjustment> adjustment, unsigned step = 1, unsigned digits = 0):
 	label(name),
-	spin(adjustment)
+	spin(adjustment, step, digits)
 {	
 	set_border_width(10);
 	

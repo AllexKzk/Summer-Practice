@@ -1,16 +1,9 @@
 #include "InputFrame.h"
 #include <string>
 
-InputFrame::InputFrame():
-	inputMainBox(Gtk::ORIENTATION_VERTICAL, 10),
-	input(0)
+InputFrame::InputFrame()
 {
 	set_label("Введите значения: ");
-	inputMainBox.set_border_width(10);
-	inputMainBox.pack_start(input);
-
-	add(inputMainBox);
-
 	show_all_children();
 }
 
@@ -19,10 +12,15 @@ InputFrame::~InputFrame(){}
 
 void InputFrame::addTable(unsigned int size)
 {
-	input.resizeTable(size);
+	if (get_child())
+		remove();
+	auto input = Gtk::make_managed<InputTable>(size);
+	add(*input);
+	input->show();
 }
 
 InputTable& InputFrame::getInputTable()
 {
-	return input;
+	InputTable* table = (InputTable*) get_child();
+	return *table;
 }
