@@ -12,8 +12,6 @@ ChooseFileWindow::ChooseFileWindow():
 	filter_text->set_name("Text files");
 	filter_text->add_mime_type("text/plain");
 	dialog.add_filter(filter_text);
-
-	//Show the dialog and wait for a user response:
 }
 
 unsigned short ChooseFileWindow::open()
@@ -23,19 +21,17 @@ unsigned short ChooseFileWindow::open()
 	switch(result)
 	{
 		case (Gtk::RESPONSE_OK):
-		  std::cout << "Select clicked." << std::endl;
-		  std::cout << "Folder selected: " << dialog.get_filename()
-		      << std::endl;
+		  filePath = dialog.get_filename();
 		  return 1;
 		case (Gtk::RESPONSE_CANCEL):
-		  std::cout << "Cancel clicked." << std::endl;
 		  return 0;
 		default:
-		  std::cout << "Unexpected button clicked." << std::endl;
 		  return 0;
 	}
 
 	return 0;
 }
+
+std::string ChooseFileWindow::getFilePath(){ return filePath; }
 
 ChooseFileWindow::~ChooseFileWindow(){}

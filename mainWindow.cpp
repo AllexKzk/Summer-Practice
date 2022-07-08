@@ -42,13 +42,14 @@ void MainWindow::changeFrame(){
 				mode = fileWindow.open();
 				if (mode){
 					settings.hide();
+					input.addTable(fileWindow.getFilePath(), settings.getN());
 					changeFrame();
 				}
 			}
 			break;
 		case 1:
 			input.hide();
-			steps.initGARunner(settings, input.getInputTable());
+			steps.initGARunner(settings, input.getMatrix());
 			steps.show();
 			nextStep.set_label("К результату");
 			mode = 2;

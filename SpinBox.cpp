@@ -1,6 +1,6 @@
 #include "SpinBox.h"
 
-SpinBox::SpinBox(Glib::ustring name, Glib::RefPtr<Gtk::Adjustment> adjustment, unsigned step = 1, unsigned digits = 0):
+SpinBox::SpinBox(Glib::ustring name, Glib::RefPtr<Gtk::Adjustment> adjustment, unsigned step, unsigned digits):
 	label(name),
 	spin(adjustment, step, digits)
 {	
