@@ -1,6 +1,7 @@
 #include "StepFrame.h"
 
 #include <iostream>
+#include <glibmm.h>
 
 #include "algorithm/perm_ga.h"
 #include "algorithm/perm_conv.h"
@@ -12,18 +13,19 @@
 static void GACBIterationStart(GARunner<BoolString>& gar, std::vector<BoolString> pop)
 {
 	StepFrame* self = std::any_cast<StepFrame*>(gar.get_parameter("step_frame", nullptr));
-	self->crossingOver.clear();
-	self->initPopulation.clear();
-	self->mutations.clear();
-	self->newPopulation.clear();
-	self->bestObj.clear();
+	--self->iteration_left;
+	self->queueClearTable(StepFrameTable_initPopulation);
+	self->queueClearTable(StepFrameTable_crossingOver);
+	self->queueClearTable(StepFrameTable_mutations);
+	self->queueClearTable(StepFrameTable_newPopulation);
+	self->queueClearTable(StepFrameTable_bestObj);
 
 	size_t mat_size = std::any_cast<std::vector<std::vector<double>>>(gar.get_parameter("cost_matrix", {})).size();
 	for(auto i = pop.begin(); i != pop.end(); ++i){
 		std::stringstream obj, fit;
 		obj << bool_string_to_perm(*i, mat_size);
 		fit << gar.fitness_func(gar, *i);
-		self->initPopulation.addRow(obj.str(), fit.str());
+		self->queueTableRow(StepFrameTable_initPopulation, obj.str(), fit.str());
 	}
 }
 static void GACBNewChildren(GARunner<BoolString>& gar, std::pair<BoolString, BoolString> parents, std::vector<BoolString> children)
@@ -35,7 +37,7 @@ static void GACBNewChildren(GARunner<BoolString>& gar, std::pair<BoolString, Boo
 	parents_str << bool_string_to_perm(parents.first, mat_size) << " " << bool_string_to_perm(parents.second, mat_size);
 	for(auto i = children.begin(); i != children.end(); ++i)
 		children_str << bool_string_to_perm(*i, mat_size) << ' ';
-	self->crossingOver.addRow(parents_str.str(), children_str.str());
+	self->queueTableRow(StepFrameTable_crossingOver, parents_str.str(), children_str.str());
 }
 static void GACBMutation(GARunner<BoolString>& gar, std::vector<BoolString> old_children, std::vector<BoolString> new_children)
 {
@@ -47,7 +49,7 @@ static void GACBMutation(GARunner<BoolString>& gar, std::vector<BoolString> old_
 		before_mut << bool_string_to_perm(*i, mat_size);
 		after_mut << bool_string_to_perm(*j, mat_size);
 		if(before_mut.str() != after_mut.str())
-		self->mutations.addRow(before_mut.str(), after_mut.str());
+		self->queueTableRow(StepFrameTable_mutations, before_mut.str(), after_mut.str());
 	}
 }
 static void GACBNewPopulation(GARunner<BoolString>& gar, std::vector<BoolString> pop)
@@ -61,14 +63,14 @@ static void GACBNewPopulation(GARunner<BoolString>& gar, std::vector<BoolString>
 		obj << bool_string_to_perm(*i, mat_size);
 		double fit_val = gar.fitness_func(gar, *i);
 		fit << fit_val;
-		self->newPopulation.addRow(obj.str(), fit.str());
+		self->queueTableRow(StepFrameTable_newPopulation, obj.str(), fit.str());
 
 		if(fit_val > best_fit)
 		{ best_fit = fit_val; best_obj_str = obj.str(); }
 	}
 
 	std::stringstream fit; fit << best_fit;
-	self->bestObj.addRow(best_obj_str, fit.str());
+	self->queueTableRow(StepFrameTable_bestObj, best_obj_str, fit.str());
 }
 
 StepFrame::StepFrame():
@@ -97,10 +99,14 @@ StepFrame::StepFrame():
 	mainStepBox.pack_start(nextStep);
 
 	add(mainStepBox);
+
+	pthread_mutex_init(&table_queue_mutex, NULL);
+	sigc::slot<bool()> timer_slot = sigc::mem_fun(*this, &StepFrame::processQueue);
+	auto conn = Glib::signal_timeout().connect(timer_slot, 10);
 }
 void StepFrame::initGARunner(SettingsFrame& sfr, std::vector<std::vector<double>> matrix)
 {
-	// TODO: change mutation chance
+	iteration_left = sfr.getIterationStop();
 	gar = new GARunner<BoolString>(sfr.getPopSize(), generate_rand_perms(sfr.getN(), sfr.getPopSize()), 1.0, perm_fitness_func,
 											multi_point_crossingover, density_mutation_op, roulette_bs_selection_op, elite_truncation_survivor_selection_op);
 	gar->add_parameter("step_frame", this);
@@ -115,6 +121,44 @@ void StepFrame::initGARunner(SettingsFrame& sfr, std::vector<std::vector<double>
 
 void StepFrame::newStep()
 {
-	gar->do_iteration();
-	//gar->thread_iterate_count(1);
+	gar->thread_iterate_count(1);
+}
+
+
+void StepFrame::queueTableRow(StepFrameTableEnum tb, std::string s1, std::string s2)
+{
+	pthread_mutex_lock(&table_queue_mutex);
+	table_queue[tb].push_back({s1, s2});
+	pthread_mutex_unlock(&table_queue_mutex);
+}
+void StepFrame::queueClearTable(StepFrameTableEnum tb)
+{
+	pthread_mutex_lock(&table_queue_mutex);
+	table_queue[tb].clear();
+	pthread_mutex_unlock(&table_queue_mutex);
+}
+bool StepFrame::processQueue()
+{
+	pthread_mutex_lock(&table_queue_mutex);
+	for(size_t i = 0; i < StepFrameTableCount; ++i){
+		tables[i]->clear();
+		for(size_t j = 0; j < table_queue[i].size(); ++i)
+			 tables[i]->addRow(table_queue[i][j].first, table_queue[i][j].second);
+	}
+	pthread_mutex_unlock(&table_queue_mutex);
+	return true;
+}
+
+bool StepFrame::isDone() { return iteration_left <= 0; }
+void StepFrame::workUntilDone() { gar->thread_iterate_count(iteration_left); }
+Permutation StepFrame::getResult()
+{
+	std::vector<BoolString>& vbs = gar->get_current_population();
+	BoolString min; double min_fit = -INFINITY;
+	for(auto i = vbs.begin(); i != vbs.end(); ++i)
+		if(gar->fitness_func(*gar, *i) > min_fit)
+		{ min_fit = gar->fitness_func(*gar, min); min = *i; }
+
+    size_t mat_size = std::any_cast<std::vector<std::vector<double>>>(gar->get_parameter("cost_matrix", {})).size();
+	return bool_string_to_perm(min, mat_size);
 }

@@ -55,6 +55,12 @@ void MainWindow::changeFrame(){
 			mode = 2;
 			break;
 		case 2:
+			if(!steps.isDone()){
+				steps.workUntilDone();
+				break;
+			}
+
+			result.setResult(steps.getResult());
 			steps.hide();
 			result.show();
 

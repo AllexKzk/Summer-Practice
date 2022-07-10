@@ -7,10 +7,19 @@ ResultFrame::ResultFrame():
 	set_label("Результат:");
 	mainResBox.set_border_width(20);
 
-	answer.importFromFile(fileName);
 	mainResBox.pack_start(answer);
 
 	add(mainResBox);
 }
 
 ResultFrame::~ResultFrame(){}
+
+void ResultFrame::setResult(Permutation perm)
+{
+	answer.clear();
+	for(size_t i = 0; i < perm.size(); ++i){
+		std::stringstream is; is << i;
+		std::stringstream ws; ws << perm[i];
+		answer.addRow(is.str(), ws.str());
+	}
+}
