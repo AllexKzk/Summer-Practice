@@ -83,6 +83,8 @@ StepFrame::StepFrame():
 	bestObj("Лучшая особь", "")
 {
 	set_label("Пошаговая визуализация:");
+	set_valign(Gtk::ALIGN_FILL);
+	mainStepBox.set_valign(Gtk::ALIGN_FILL);
 	mainStepBox.set_border_width(20);
 
 	tables = {&initPopulation, &crossingOver,
@@ -90,6 +92,7 @@ StepFrame::StepFrame():
 
 	for (auto pTable: tables){
 		mainStepBox.pack_start(*pTable);
+		pTable->set_propagate_natural_height();
 	}
 
 	nextStep.signal_clicked().connect( sigc::mem_fun(*this,

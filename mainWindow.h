@@ -7,12 +7,18 @@
 #include "StepFrame.h"
 #include "ResultFrame.h"
 #include "ChooseFileWindow.h"
+#include "ErrorWindow.h"
 
 class MainWindow : public Gtk::Window
 {
 private:
 	Gtk::Box mainBox;
 	Gtk::Button nextStep;
+
+	Gtk::ProgressBar activityBar;
+	sigc::connection timeoutConnection;
+	bool timeCheck();
+	
 	SettingsFrame settings;
 	InputFrame input;
 	StepFrame steps;

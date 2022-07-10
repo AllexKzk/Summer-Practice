@@ -14,6 +14,7 @@ void InputFrame::addTable(unsigned int size)
 	if (get_child())
 		remove();
 	auto input = Gtk::make_managed<InputTable>(size);
+	input->set_propagate_natural_height();
 	isGui = true;
 	add(*input);
 	input->show();
