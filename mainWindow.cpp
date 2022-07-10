@@ -12,10 +12,17 @@ MainWindow::MainWindow():
 	nextStep.set_halign(Gtk::ALIGN_END);
 	nextStep.set_valign(Gtk::ALIGN_END);
 
+	activityBar.set_halign(Gtk::ALIGN_CENTER);
+	activityBar.set_valign(Gtk::ALIGN_CENTER);
+	activityBar.set_text("Пожалуйста, подождите");
+	
+	steps.set_valign(Gtk::ALIGN_FILL);
+
 	mainBox.pack_start(settings);
 	mainBox.pack_start(input);
 	mainBox.pack_start(steps);
 	mainBox.pack_start(result);
+	mainBox.pack_start(activityBar);
 	mainBox.pack_start(nextStep);
 	add(mainBox);
 
@@ -23,9 +30,21 @@ MainWindow::MainWindow():
 	input.hide();
 	steps.hide();
 	result.hide();
+	activityBar.hide();
 }
 
 MainWindow::~MainWindow(){}
+
+bool MainWindow::timeCheck()
+{
+	if (steps.isDone()){
+		activityBar.hide();
+		changeFrame();
+		return false;
+	}
+	activityBar.pulse();
+	return true;
+}
 
 void MainWindow::changeFrame(){
 	switch(mode)
@@ -55,15 +74,20 @@ void MainWindow::changeFrame(){
 			mode = 2;
 			break;
 		case 2:
+			steps.hide();
 			if(!steps.isDone()){
+				nextStep.hide();
 				steps.workUntilDone();
+				timeoutConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this, &MainWindow::timeCheck), 50);
+				activityBar.set_show_text();
+				activityBar.show();
 				break;
 			}
 
 			result.setResult(steps.getResult());
-			steps.hide();
 			result.show();
 
+			nextStep.show();
 			nextStep.set_label("Задать новые данные");
 			mode = 3;
 			break;
