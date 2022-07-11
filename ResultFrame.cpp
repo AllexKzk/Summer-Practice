@@ -6,7 +6,7 @@ ResultFrame::ResultFrame():
 {
 	set_label("Результат:");
 	mainResBox.set_border_width(20);
-
+	answer.set_propagate_natural_height();
 	mainResBox.pack_start(answer);
 
 	add(mainResBox);
