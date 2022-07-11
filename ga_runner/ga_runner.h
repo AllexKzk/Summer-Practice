@@ -42,12 +42,12 @@ class GARunner
 
 		std::random_device dev_urandom;
 
-		void print_data(std::vector<data> wh)
+		void print_data(std::vector<data> wh, std::ostream& os = std::cout)
 		{
 			for(size_t i = 0; i < wh.size(); ++i){
-				std::cout << wh[i] << ' ';
+				os << wh[i] << ' ';
 			}
-			std::cout << '\n';
+			os << '\n';
 		}
 
 		// Оперирование в отдельном потоке
@@ -111,14 +111,12 @@ class GARunner
 			for(size_t i = 0; i <= population_size; i += 2){
 				// отбираем двух родителей
 				std::pair<data, data> parents = parent_selection_op(*this, current_population);
-				std::cout << "parents: "; print_data({parents.first, parents.second});
 				if(parents.first != parents.second){
 					std::vector<data> more_children = recombination_op(*this, parents.first, parents.second); // проводим скрещивание
 					std::copy(more_children.begin(), more_children.end(), std::back_inserter(children));
 					if(callback_new_children) callback_new_children(*this, parents, more_children);
 				}
 			}
-			std::cout << "children: "; print_data(children);
 
 			std::vector<data> old_children = children;
 			std::mt19937 rng(dev_urandom());
@@ -127,13 +125,11 @@ class GARunner
 				if(mutation_dist(rng) < mutation_chance)
 					children[i] = mutation_op(*this, children[i]);	// производим мутацию с заданным шансом
 			if(callback_mutation) callback_mutation(*this, old_children, children);
-			std::cout << "mutated children: "; print_data(children);
 
 			// заносим детей и родителей в один список и отбираем оттуда особей для следующей популяции
 			std::copy(children.begin(), children.end(), std::back_inserter(current_population));
 			current_population = survivor_selection_op(*this, current_population, population_size);
 			if(callback_new_population) callback_new_population(*this, current_population);
-			std::cout << "current population: "; print_data(current_population);
 
 			return children.size();
 		}
@@ -173,8 +169,6 @@ class GARunner
 				return _default;
 			return parameters[name];
 		}
-
-		void print_current_population() { print_data(current_population); }
 };
 
 #endif

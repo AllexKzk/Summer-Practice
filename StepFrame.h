@@ -40,6 +40,7 @@ private:
 
 public:
 	StepFrame();
+	virtual ~StepFrame();
 	void initGARunner(SettingsFrame& sfr, std::vector<std::vector<double>> matrix);
 
 	void newStep();
@@ -56,6 +57,9 @@ public:
 	void workUntilDone();
 
 	Permutation getResult();
+
+	const std::string log_out_fname = "ga_out.txt";
+	std::ofstream* log_out = nullptr;
 };
 
 #endif

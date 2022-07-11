@@ -60,9 +60,12 @@ void MainWindow::changeFrame(){
 				ChooseFileWindow fileWindow;
 				mode = fileWindow.open();
 				if (mode){
-					settings.hide();
-					input.addTable(fileWindow.getFilePath(), settings.getN());
-					changeFrame();
+					if(input.addTable(fileWindow.getFilePath(), settings.getN())){
+						settings.hide();
+						changeFrame();
+					}
+					else
+						mode = 0;
 				}
 			}
 			break;

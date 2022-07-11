@@ -1,5 +1,7 @@
 #include "InputFrame.h"
+#include "ErrorWindow.h"
 #include <iostream>
+
 InputFrame::InputFrame()
 {
 	set_label("Введите значения: ");
@@ -20,7 +22,7 @@ void InputFrame::addTable(unsigned int size)
 	input->show();
 }
 
-void InputFrame::addTable(std::string filePath, unsigned N)
+bool InputFrame::addTable(std::string filePath, unsigned N)
 {
 	std::fstream file;
 	file.open(filePath, std::fstream::in);
@@ -36,14 +38,21 @@ void InputFrame::addTable(std::string filePath, unsigned N)
 			for (unsigned j = 0; j < N; ++j)
 			{
 				file >> num;				//try/catch read
-				std::cout << num << " ";
+				if(file.eof()){
+					ErrorWindow("Неожиданный конец файла", "Ошибка чтения матрицы затрат с файла: неожиданный конец файла (недостаточно данных для заданного размера матрицы)");
+					return false;
+				}
+				else if(file.fail()){
+					ErrorWindow("Не удалось считать файл", "Ошибка чтения матрицы затрат с файла: не удалось считать файл (проверьте права доступа к файлу)");
+					return false;
+				}
 				buf.push_back(num);
 			}
-			std::cout << std::endl;
 			matrix.push_back(buf);
 		}
 		file.close();
 	}
+	return true;
 }
 
 std::vector<std::vector<double>> InputFrame::getMatrix()

@@ -14,7 +14,7 @@ public:
 	InputFrame();
 	virtual ~InputFrame();
 	void addTable(unsigned int size);				//GUI
-	void addTable(std::string filePath, unsigned N);//FILE
+	bool addTable(std::string filePath, unsigned N);//FILE
 	std::vector<std::vector<double>> getMatrix();
 };
 

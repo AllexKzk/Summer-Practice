@@ -27,6 +27,8 @@ static void GACBIterationStart(GARunner<BoolString>& gar, std::vector<BoolString
 		fit << gar.fitness_func(gar, *i);
 		self->queueTableRow(StepFrameTable_initPopulation, obj.str(), fit.str());
 	}
+
+	*self->log_out << "---- iterations left: " << self->iteration_left + 1 << " ----\n";
 }
 static void GACBNewChildren(GARunner<BoolString>& gar, std::pair<BoolString, BoolString> parents, std::vector<BoolString> children)
 {
@@ -38,6 +40,7 @@ static void GACBNewChildren(GARunner<BoolString>& gar, std::pair<BoolString, Boo
 	for(auto i = children.begin(); i != children.end(); ++i)
 		children_str << bool_string_to_perm(*i, mat_size) << ' ';
 	self->queueTableRow(StepFrameTable_crossingOver, parents_str.str(), children_str.str());
+	*self->log_out << "parents: " << parents_str.str() << "\tchildren: " << children_str.str() << "\n";
 }
 static void GACBMutation(GARunner<BoolString>& gar, std::vector<BoolString> old_children, std::vector<BoolString> new_children)
 {
@@ -50,6 +53,8 @@ static void GACBMutation(GARunner<BoolString>& gar, std::vector<BoolString> old_
 		after_mut << bool_string_to_perm(*j, mat_size);
 		if(before_mut.str() != after_mut.str())
 		self->queueTableRow(StepFrameTable_mutations, before_mut.str(), after_mut.str());
+		if(before_mut.str() != after_mut.str())
+			*self->log_out << "mutation: " << before_mut.str() << "--> " << after_mut.str() << '\n';
 	}
 }
 static void GACBNewPopulation(GARunner<BoolString>& gar, std::vector<BoolString> pop)
@@ -57,6 +62,7 @@ static void GACBNewPopulation(GARunner<BoolString>& gar, std::vector<BoolString>
 	StepFrame* self = std::any_cast<StepFrame*>(gar.get_parameter("step_frame", nullptr));
 	size_t mat_size = std::any_cast<std::vector<std::vector<double>>>(gar.get_parameter("cost_matrix", {})).size();
 
+	*self->log_out << "new population:\n";
 	double best_fit = -INFINITY; std::string best_obj_str = "";
 	for(auto i = pop.begin(); i != pop.end(); ++i){
 		std::stringstream obj, fit;
@@ -64,10 +70,12 @@ static void GACBNewPopulation(GARunner<BoolString>& gar, std::vector<BoolString>
 		double fit_val = gar.fitness_func(gar, *i);
 		fit << fit_val;
 		self->queueTableRow(StepFrameTable_newPopulation, obj.str(), fit.str());
+		*self->log_out << obj.str() << '\t' << fit.str() << '\n';
 
 		if(fit_val > best_fit)
 		{ best_fit = fit_val; best_obj_str = obj.str(); }
 	}
+	*self->log_out << "best individual: " << best_obj_str << '(' << best_fit << ")\n";
 
 	std::stringstream fit; fit << best_fit;
 	self->queueTableRow(StepFrameTable_bestObj, best_obj_str, fit.str());
@@ -107,6 +115,13 @@ StepFrame::StepFrame():
 	sigc::slot<bool()> timer_slot = sigc::mem_fun(*this, &StepFrame::processQueue);
 	auto conn = Glib::signal_timeout().connect(timer_slot, 10);
 }
+StepFrame::~StepFrame()
+{
+	if(log_out){
+		log_out->close();
+		delete log_out;
+	}
+}
 void StepFrame::initGARunner(SettingsFrame& sfr, std::vector<std::vector<double>> matrix)
 {
 	iteration_left = sfr.getIterationStop();
@@ -118,6 +133,12 @@ void StepFrame::initGARunner(SettingsFrame& sfr, std::vector<std::vector<double>
 	gar->callback_new_children = GACBNewChildren;
 	gar->callback_mutation = GACBMutation;
 	gar->callback_new_population = GACBNewPopulation;
+
+	if(log_out){
+		log_out->close();
+		delete log_out;
+	}
+	log_out = new std::ofstream(log_out_fname);
 
 	newStep();
 }
